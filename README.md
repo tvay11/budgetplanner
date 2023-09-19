@@ -52,7 +52,7 @@ This is a simple budget planner application built using C++ and SQLite. The appl
 1. **Run the Application**
 
     ```
-    ./my_program
+    ./budgetplanner
     ```
 
 2. **Follow On-Screen Instructions**
