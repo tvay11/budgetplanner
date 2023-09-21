@@ -3,4 +3,4 @@ project(budgetplanner)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(budgetplanner main.cpp sqlite3.c)
+add_executable(budgetplanner main.cpp sqlite3.c budgetSQL.cpp budgetSQL.h)

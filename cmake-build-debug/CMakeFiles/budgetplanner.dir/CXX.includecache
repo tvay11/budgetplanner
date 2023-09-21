@@ -6,11 +6,27 @@
 
 #IncludeRegexTransform: 
 
-/Users/thangvay/CLionProjects/budgetplanner/main.cpp
+/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.cpp
+budgetSQL.h
+/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.h
+fstream
+-
+
+/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.h
 iostream
 -
 sqlite3.h
 -
 limits
 -
+string
+-
+
+/Users/thangvay/CLionProjects/budgetplanner/main.cpp
+iostream
+-
+sqlite3.h
+-
+budgetSQL.h
+/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.h
 

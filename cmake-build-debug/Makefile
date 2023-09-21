@@ -129,6 +129,30 @@ budgetplanner/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/build
 .PHONY : budgetplanner/fast
 
+budgetSQL.o: budgetSQL.cpp.o
+.PHONY : budgetSQL.o
+
+# target to build an object file
+budgetSQL.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/budgetSQL.cpp.o
+.PHONY : budgetSQL.cpp.o
+
+budgetSQL.i: budgetSQL.cpp.i
+.PHONY : budgetSQL.i
+
+# target to preprocess a source file
+budgetSQL.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/budgetSQL.cpp.i
+.PHONY : budgetSQL.cpp.i
+
+budgetSQL.s: budgetSQL.cpp.s
+.PHONY : budgetSQL.s
+
+# target to generate assembly for a file
+budgetSQL.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/budgetSQL.cpp.s
+.PHONY : budgetSQL.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -186,6 +210,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... budgetplanner"
+	@echo "... budgetSQL.o"
+	@echo "... budgetSQL.i"
+	@echo "... budgetSQL.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

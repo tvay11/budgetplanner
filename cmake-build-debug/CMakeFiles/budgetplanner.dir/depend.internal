@@ -3,5 +3,9 @@
 
 CMakeFiles/budgetplanner.dir/sqlite3.c.o
  /Users/thangvay/CLionProjects/budgetplanner/sqlite3.c
+CMakeFiles/budgetplanner.dir/budgetSQL.cpp.o
+ /Users/thangvay/CLionProjects/budgetplanner/budgetSQL.cpp
+ /Users/thangvay/CLionProjects/budgetplanner/budgetSQL.h
 CMakeFiles/budgetplanner.dir/main.cpp.o
+ /Users/thangvay/CLionProjects/budgetplanner/budgetSQL.h
  /Users/thangvay/CLionProjects/budgetplanner/main.cpp

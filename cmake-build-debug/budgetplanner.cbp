@@ -80,6 +80,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.cpp">
+			<Option target="budgetplanner"/>
+		</Unit>
+		<Unit filename="/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.h">
+			<Option target="budgetplanner"/>
+		</Unit>
 		<Unit filename="/Users/thangvay/CLionProjects/budgetplanner/main.cpp">
 			<Option target="budgetplanner"/>
 		</Unit>
