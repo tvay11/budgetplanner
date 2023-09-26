@@ -65,6 +65,42 @@ CMAKE_BINARY_DIR = /Users/thangvay/CLionProjects/budgetplanner/cmake-build-debug
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -84,6 +120,15 @@ edit_cache:
 # Special rule for the target edit_cache
 edit_cache/fast: edit_cache
 .PHONY : edit_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"gmock\" \"gtest\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -129,12 +174,78 @@ budgetplanner/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/build
 .PHONY : budgetplanner/fast
 
+#=============================================================================
+# Target rules for targets named runBudgetSQLTests
+
+# Build rule for target.
+runBudgetSQLTests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 runBudgetSQLTests
+.PHONY : runBudgetSQLTests
+
+# fast build rule for target.
+runBudgetSQLTests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/build
+.PHONY : runBudgetSQLTests/fast
+
+#=============================================================================
+# Target rules for targets named gmock
+
+# Build rule for target.
+gmock: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gmock
+.PHONY : gmock
+
+# fast build rule for target.
+gmock/fast:
+	$(MAKE) $(MAKESILENT) -f googletest/googletest/googlemock/CMakeFiles/gmock.dir/build.make googletest/googletest/googlemock/CMakeFiles/gmock.dir/build
+.PHONY : gmock/fast
+
+#=============================================================================
+# Target rules for targets named gmock_main
+
+# Build rule for target.
+gmock_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gmock_main
+.PHONY : gmock_main
+
+# fast build rule for target.
+gmock_main/fast:
+	$(MAKE) $(MAKESILENT) -f googletest/googletest/googlemock/CMakeFiles/gmock_main.dir/build.make googletest/googletest/googlemock/CMakeFiles/gmock_main.dir/build
+.PHONY : gmock_main/fast
+
+#=============================================================================
+# Target rules for targets named gtest_main
+
+# Build rule for target.
+gtest_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gtest_main
+.PHONY : gtest_main
+
+# fast build rule for target.
+gtest_main/fast:
+	$(MAKE) $(MAKESILENT) -f googletest/googletest/googletest/CMakeFiles/gtest_main.dir/build.make googletest/googletest/googletest/CMakeFiles/gtest_main.dir/build
+.PHONY : gtest_main/fast
+
+#=============================================================================
+# Target rules for targets named gtest
+
+# Build rule for target.
+gtest: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gtest
+.PHONY : gtest
+
+# fast build rule for target.
+gtest/fast:
+	$(MAKE) $(MAKESILENT) -f googletest/googletest/googletest/CMakeFiles/gtest.dir/build.make googletest/googletest/googletest/CMakeFiles/gtest.dir/build
+.PHONY : gtest/fast
+
 budgetSQL.o: budgetSQL.cpp.o
 .PHONY : budgetSQL.o
 
 # target to build an object file
 budgetSQL.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/budgetSQL.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/budgetSQL.cpp.o
 .PHONY : budgetSQL.cpp.o
 
 budgetSQL.i: budgetSQL.cpp.i
@@ -143,6 +254,7 @@ budgetSQL.i: budgetSQL.cpp.i
 # target to preprocess a source file
 budgetSQL.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/budgetSQL.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/budgetSQL.cpp.i
 .PHONY : budgetSQL.cpp.i
 
 budgetSQL.s: budgetSQL.cpp.s
@@ -151,7 +263,32 @@ budgetSQL.s: budgetSQL.cpp.s
 # target to generate assembly for a file
 budgetSQL.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/budgetSQL.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/budgetSQL.cpp.s
 .PHONY : budgetSQL.cpp.s
+
+budgetSQLtest.o: budgetSQLtest.cpp.o
+.PHONY : budgetSQLtest.o
+
+# target to build an object file
+budgetSQLtest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/budgetSQLtest.cpp.o
+.PHONY : budgetSQLtest.cpp.o
+
+budgetSQLtest.i: budgetSQLtest.cpp.i
+.PHONY : budgetSQLtest.i
+
+# target to preprocess a source file
+budgetSQLtest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/budgetSQLtest.cpp.i
+.PHONY : budgetSQLtest.cpp.i
+
+budgetSQLtest.s: budgetSQLtest.cpp.s
+.PHONY : budgetSQLtest.s
+
+# target to generate assembly for a file
+budgetSQLtest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/budgetSQLtest.cpp.s
+.PHONY : budgetSQLtest.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -183,6 +320,7 @@ sqlite3.o: sqlite3.c.o
 # target to build an object file
 sqlite3.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/sqlite3.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/sqlite3.c.o
 .PHONY : sqlite3.c.o
 
 sqlite3.i: sqlite3.c.i
@@ -191,6 +329,7 @@ sqlite3.i: sqlite3.c.i
 # target to preprocess a source file
 sqlite3.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/sqlite3.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/sqlite3.c.i
 .PHONY : sqlite3.c.i
 
 sqlite3.s: sqlite3.c.s
@@ -199,6 +338,7 @@ sqlite3.s: sqlite3.c.s
 # target to generate assembly for a file
 sqlite3.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/budgetplanner.dir/build.make CMakeFiles/budgetplanner.dir/sqlite3.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/runBudgetSQLTests.dir/build.make CMakeFiles/runBudgetSQLTests.dir/sqlite3.c.s
 .PHONY : sqlite3.c.s
 
 # Help Target
@@ -208,11 +348,23 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... budgetplanner"
+	@echo "... gmock"
+	@echo "... gmock_main"
+	@echo "... gtest"
+	@echo "... gtest_main"
+	@echo "... runBudgetSQLTests"
 	@echo "... budgetSQL.o"
 	@echo "... budgetSQL.i"
 	@echo "... budgetSQL.s"
+	@echo "... budgetSQLtest.o"
+	@echo "... budgetSQLtest.i"
+	@echo "... budgetSQLtest.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

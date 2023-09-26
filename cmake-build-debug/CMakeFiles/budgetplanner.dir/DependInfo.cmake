@@ -15,6 +15,8 @@ set(CMAKE_C_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
+  "../googletest/googletest/googletest/include"
+  "../googletest/googletest/googletest"
   )
 set(CMAKE_DEPENDS_CHECK_CXX
   "/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.cpp" "/Users/thangvay/CLionProjects/budgetplanner/cmake-build-debug/CMakeFiles/budgetplanner.dir/budgetSQL.cpp.o"
@@ -24,6 +26,8 @@ set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "../googletest/googletest/googletest/include"
+  "../googletest/googletest/googletest"
   )
 
 # The set of dependency files which are needed:

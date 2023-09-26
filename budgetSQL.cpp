@@ -18,26 +18,25 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
 }
 
 void createTable(sqlite3 *db) {
-    char *ErroMsg = nullptr;
-    const char *sqlCreateTable = "CREATE TABLE IF NOT EXISTS TRANSACTIONS (" \
+    char *ErrorMsg = nullptr;
+    const char *sqlCreateTable = "CREATE TABLE IF NOT EXISTS BUDGET (" \
                                  "ID INTEGER PRIMARY KEY AUTOINCREMENT," \
                                  "TYPE CHAR(1)," \
                                  "TITLE TEXT NOT NULL," \
                                  "AMOUNT REAL," \
-                                 "CATEGORY TEXT);";  // Added CATEGORY column
-    int rc = sqlite3_exec(db, sqlCreateTable, callback, 0, &ErroMsg);
+                                 "CATEGORY TEXT);";
+    int rc = sqlite3_exec(db, sqlCreateTable, callback, 0, &ErrorMsg);
     if(rc != SQLITE_OK) {
-        cout << "SQL error: " << ErroMsg << "\n";
-        sqlite3_free(ErroMsg);
+        cout << "SQL error: " << ErrorMsg << "\n";
+        sqlite3_free(ErrorMsg);
     } else {
         cout << "Table created successfully\n";
     }
 }
 
-
 void dropTable(sqlite3 *db) {
     char *ErrorMsg = nullptr;
-    const char *sqlDropTable = "DROP TABLE IF EXISTS TRANSACTIONS;";
+    const char *sqlDropTable = "DROP TABLE IF EXISTS BUDGET;";
     int rc = sqlite3_exec(db, sqlDropTable, callback, 0, &ErrorMsg);
     if(rc != SQLITE_OK) {
         cout << "SQL error: " << ErrorMsg << "\n";
@@ -46,6 +45,7 @@ void dropTable(sqlite3 *db) {
         cout << "Table dropped successfully\n";
     }
 }
+
 
 string center(const string &str, int width) {
     string truncated_str = str.substr(0, width);
@@ -79,7 +79,7 @@ void viewTransactions(sqlite3 *db) {
     char *ErrorMsg = nullptr;
     totalAmount = 0.0;  // Reset the total amount
 
-    const char *sqlSelect = "SELECT * FROM TRANSACTIONS ORDER BY TYPE;";
+    const char *sqlSelect = "SELECT * FROM BUDGET ORDER BY TYPE;";
     cout << endl;
     cout << "|" << center("ID", 5)
          << "|" << center("Type", 6)
@@ -162,20 +162,9 @@ pair<string, string> selectCategory() {
     return make_pair(category, type);
 }
 
-
-void addTransaction(sqlite3 *db) {
-    char *ErrorMsg = nullptr;
+pair<string, float> getUserInput(const pair<string, string>& choice) {
     string title;
-    string category;
     float amount;
-    string type;
-
-    pair<string, string> choice = selectCategory(); // first is category, second is type
-
-    if (choice.first == "Exit") {
-        cout << "Exiting the program." << endl;
-        return;
-    }
 
     cout << "Enter title: ";
     cin >> ws;
@@ -192,7 +181,26 @@ void addTransaction(sqlite3 *db) {
         }
     }
 
-    string sqlInsert = "INSERT INTO TRANSACTIONS (TYPE, TITLE, AMOUNT, CATEGORY) VALUES ('"
+    return make_pair(title, amount);
+}
+
+
+void addTransaction(sqlite3 *db) {
+    pair<string, string> choice = selectCategory();  // first is category, second is type
+
+    if (choice.first == "Exit") {
+        cout << "Exiting the program." << endl;
+        return;
+    }
+
+    auto userInput = getUserInput(choice);  // first is title, second is amount
+    insertIntoBudgetDB(db, choice, userInput.first, userInput.second);
+}
+
+void insertIntoBudgetDB(sqlite3 *db, const pair<string, string>& choice, const string& title, float amount) {
+    char *ErrorMsg = nullptr;
+
+    string sqlInsert = "INSERT INTO BUDGET (TYPE, TITLE, AMOUNT, CATEGORY) VALUES ('"
                        + choice.second + "','" + title.substr(0, 15) + "'," + to_string(amount) + ",'" + choice.first + "');";
 
     int rc = sqlite3_exec(db, sqlInsert.c_str(), callback, 0, &ErrorMsg);
@@ -204,56 +212,58 @@ void addTransaction(sqlite3 *db) {
     }
 }
 
+bool idExists(sqlite3 *db, int id) {
+    string sqlQuery = "SELECT COUNT(*) FROM BUDGET WHERE ID=" + to_string(id) + ";";
+    sqlite3_stmt *stmt;
+    bool exists = false;
 
-void deleteTransaction(sqlite3 *db) {
-    char *ErrorMsg = nullptr;
-    viewTransactions(db);
-
-    int id;
-    bool validID = false;
-
-    while (!validID) {
-        cout << "Enter the ID that you want to delete or 0 to return: ";
-        cin >> id;
-
-        if(id == 0) {
-            return;
+    if (sqlite3_prepare_v2(db, sqlQuery.c_str(), -1, &stmt, 0) == SQLITE_OK) {
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            exists = sqlite3_column_int(stmt, 0) > 0;
         }
-
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        string sqlQuery = "SELECT COUNT(*) FROM TRANSACTIONS WHERE ID=" + to_string(id) + ";";
-        sqlite3_stmt *stmt;
-
-        if (sqlite3_prepare_v2(db, sqlQuery.c_str(), -1, &stmt, 0) == SQLITE_OK) {
-            if (sqlite3_step(stmt) == SQLITE_ROW) {
-                int count = sqlite3_column_int(stmt, 0);
-
-                if (count > 0) {
-                    validID = true;
-                } else {
-                    cout << "Invalid ID. Please try again.\n";
-                }
-            }
-
-            sqlite3_finalize(stmt);
-        } else {
-            cout << "SQL error: " << sqlite3_errmsg(db) << endl;
-        }
+        sqlite3_finalize(stmt);
     }
 
+    return exists;
+}
 
-    string sqlDelete = "DELETE FROM TRANSACTIONS WHERE ID = " + to_string(id) + ";";
-    int rc = sqlite3_exec(db, sqlDelete.c_str(), callback, 0, &ErrorMsg);
+bool deleteTransactionByID(sqlite3 *db, int id) {
+    string sqlDelete = "DELETE FROM BUDGET WHERE ID = " + to_string(id) + ";";
+    char *ErrorMsg = nullptr;
+    int rc = sqlite3_exec(db, sqlDelete.c_str(), nullptr, 0, &ErrorMsg);
 
-    if(rc != SQLITE_OK) {
+    if (rc != SQLITE_OK) {
         cout << "SQL error: " << ErrorMsg << "\n";
         sqlite3_free(ErrorMsg);
+        return false;
+    }
+    cout <<"Successfully deleted Id "<<endl;
+    return true;
+}
+
+void deleteTransactionUI(sqlite3 *db) {
+    viewTransactions(db);
+    int id;
+    cout << "Enter the ID that you want to delete or 0 to return: ";
+    cin >> id;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    if (id == 0) {
+        return;
+    }
+
+    if (idExists(db, id)) {
+        if (deleteTransactionByID(db, id)) {
+            cout << "Transaction deleted successfully.\n";
+        } else {
+            cout << "Failed to delete transaction.\n";
+        }
     } else {
-        cout << "Transaction deleted successfully\n";
+        cout << "Invalid ID. Please try again.\n";
     }
 }
+
 
 void filterByCategory(sqlite3 *db) {
     char *ErrorMsg = nullptr;
@@ -316,7 +326,7 @@ void filterByCategory(sqlite3 *db) {
          << "|" << center("Amount", 10) << "|" << endl;
     cout << "_________________________________________________________" << endl;
 
-    string sqlSelect = "SELECT * FROM TRANSACTIONS WHERE CATEGORY = '" + category + "' ORDER BY TYPE;";
+    string sqlSelect = "SELECT * FROM BUDGET WHERE CATEGORY = '" + category + "' ORDER BY TYPE;";
 
     int rc = sqlite3_exec(db, sqlSelect.c_str(), callbackTable, 0, &ErrorMsg);
 
@@ -326,33 +336,27 @@ void filterByCategory(sqlite3 *db) {
     }
 }
 
-
-
-void updateTransactions(sqlite3 *db) {
-    viewTransactions(db);
-    char *ErrorMsg = nullptr;
-    int id;
-    bool validID = false;
-    while (!validID) {
+bool getValidID(sqlite3 *db, int &id) {
+    while (true) {
         cout << "Enter ID that you want to update or 0 to return: ";
         cin >> id;
 
         if(id == 0) {
-            return;
+            return false;
         }
 
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-
-        string sqlQuery = "SELECT COUNT(*) FROM TRANSACTIONS WHERE ID=" + to_string(id) + ";";
-
+        string sqlQuery = "SELECT COUNT(*) FROM BUDGET WHERE ID=" + to_string(id) + ";";
         sqlite3_stmt *stmt;
+
         if (sqlite3_prepare_v2(db, sqlQuery.c_str(), -1, &stmt, 0) == SQLITE_OK) {
             if (sqlite3_step(stmt) == SQLITE_ROW) {
                 int count = sqlite3_column_int(stmt, 0);
                 if (count > 0) {
-                    validID = true;
+                    sqlite3_finalize(stmt);
+                    return true;
                 } else {
                     cout << "Invalid ID. Please try again.\n";
                 }
@@ -362,60 +366,76 @@ void updateTransactions(sqlite3 *db) {
             cout << "SQL error: " << sqlite3_errmsg(db) << endl;
         }
     }
+}
 
+int getUserChoice() {
     int choice;
     cout << "What would you like to update?\n";
     cout << "1. Name" << endl;
-    cout << "2. Amount"<< endl;
-    cout << "3. Category" <<endl;
+    cout << "2. Amount" << endl;
+    cout << "3. Category" << endl;
     cout << "Enter your choice (1-3): ";
     cin >> choice;
+    return choice;
+}
+
+bool updateDatabase(sqlite3 *db, const string &sqlUpdate) {
+    char *ErrorMsg = nullptr;
+    int rc = sqlite3_exec(db, sqlUpdate.c_str(), nullptr, 0, &ErrorMsg);
+    if(rc != SQLITE_OK) {
+        cout << "SQL error: " << ErrorMsg << endl;
+        sqlite3_free(ErrorMsg);
+        return false;
+    } else {
+        return true;
+    }
+}
+
+void updateTransactions(sqlite3 *db) {
+    viewTransactions(db);
+    int id;
+    if (!getValidID(db, id)) {
+        return;
+    }
+
+    int choice = getUserChoice();
 
     string sqlUpdate;
-    int rc;
 
     switch(choice) {
         case 1: {
             string newTitle;
             cout << "Enter new Title: ";
             cin >> newTitle;
-            sqlUpdate = "UPDATE TRANSACTIONS SET TITLE='" + newTitle + "' WHERE ID=" + to_string(id) + ";";
+            sqlUpdate = "UPDATE BUDGET SET TITLE='" + newTitle + "' WHERE ID=" + to_string(id) + ";";
             break;
         }
         case 2: {
             double newAmount;
             cout << "Enter new Amount: ";
             cin >> newAmount;
-            sqlUpdate = "UPDATE TRANSACTIONS SET AMOUNT=" + to_string(newAmount) + " WHERE ID=" + to_string(id) + ";";
+            sqlUpdate = "UPDATE BUDGET SET AMOUNT=" + to_string(newAmount) + " WHERE ID=" + to_string(id) + ";";
             break;
         }
         case 3: {
-            pair<string, string> newCategoryAndType = selectCategory();
-
-            if (newCategoryAndType.first == "Exit") {
+            pair<string, string> newCatAndType = selectCategory(); //get new cat and type
+            if (newCatAndType.first == "Exit") {
                 cout << "Exiting the update process.\n";
                 return;
             }
-
-            sqlUpdate = "UPDATE TRANSACTIONS SET CATEGORY='" + newCategoryAndType.first + "', TYPE='" + newCategoryAndType.second + "' WHERE ID=" + to_string(id) + ";";
+            sqlUpdate = "UPDATE BUDGET SET CATEGORY='" + newCatAndType.first + "', TYPE='" + newCatAndType.second + "' WHERE ID=" + to_string(id) + ";";
             break;
-
         }
-
         default:
             cout << "Invalid choice.\n";
             return;
     }
 
-    rc = sqlite3_exec(db, sqlUpdate.c_str(), nullptr, 0, &ErrorMsg);
-
-    if(rc != SQLITE_OK) {
-        cout << "SQL error: " << ErrorMsg << endl;
-        sqlite3_free(ErrorMsg);
-    } else {
+    if (updateDatabase(db, sqlUpdate)) {
         cout << "Update successful!\n";
     }
 }
+
 
 void searchTransactions(sqlite3 *db) {
     char *ErrorMsg = nullptr;
@@ -431,7 +451,7 @@ void searchTransactions(sqlite3 *db) {
          << "|" << center("Amount", 10) << "|" << endl;
     cout << "_________________________________________________________" << endl;
 
-    string sqlSearch = "SELECT * FROM TRANSACTIONS WHERE TITLE LIKE '%" + keyword + "%' ORDER BY TYPE;";
+    string sqlSearch = "SELECT * FROM BUDGET WHERE TITLE LIKE '%" + keyword + "%' ORDER BY TYPE;";
 
     int rc = sqlite3_exec(db, sqlSearch.c_str(), callbackTable, 0, &ErrorMsg);
 
@@ -441,27 +461,37 @@ void searchTransactions(sqlite3 *db) {
     }
 }
 
-static int callbackCSV(void *data, int argc, char **argv, char **azColName) {
-    ofstream &csvFile = *(ofstream*)data;
+static int callbackCSV(void *NotUsed, int argc, char **argv, char **azColName) {
+    ofstream* csvFile = static_cast<ofstream*>(NotUsed);
 
     for (int i = 0; i < argc; i++) {
-        if (i > 0) csvFile << ", ";
-        csvFile << (argv[i] ? argv[i] : "NULL");
+        if (i != 0) {
+            *csvFile << ", ";
+        }
+        if (argv[i]) {
+            *csvFile << argv[i];
+        } else {
+            *csvFile << "NULL";
+        }
     }
-
-    csvFile << endl;
+    *csvFile << endl;
 
     return 0;
 }
 
-// Function to export data to a CSV file
+
 void exportToCSV(sqlite3 *db) {
     char *ErrorMsg = nullptr;
-    ofstream csvFile("transactions.csv");
+    ofstream csvFile("BUDGET.csv");
+
+    if (!csvFile.is_open()) {
+        cout << "Could not open transactions.csv for writing." << endl;
+        return;
+    }
 
     csvFile << "ID, Type, Category, Title, Amount" << endl;
 
-    const char *sqlSelect = "SELECT * FROM TRANSACTIONS ORDER BY ID;";
+    const char *sqlSelect = "SELECT ID, Type, Category, Title, Amount FROM BUDGET ORDER BY ID;";
 
     int rc = sqlite3_exec(db, sqlSelect, callbackCSV, (void*)&csvFile, &ErrorMsg);
 
@@ -469,8 +499,8 @@ void exportToCSV(sqlite3 *db) {
         cout << "SQL error: " << ErrorMsg << endl;
         sqlite3_free(ErrorMsg);
     } else {
-        cout << "Data exported successfully to transactions.csv\n";
+        cout << "Data exported successfully to transactions.csv" << endl;
     }
-
     csvFile.close();
 }
+

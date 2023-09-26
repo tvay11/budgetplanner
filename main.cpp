@@ -53,7 +53,7 @@ int main() {
                 viewTransactions(db);
                 break;
             case 5:
-                deleteTransaction(db);
+                deleteTransactionUI(db);
                 break;
             case 6:
                 updateTransactions(db);

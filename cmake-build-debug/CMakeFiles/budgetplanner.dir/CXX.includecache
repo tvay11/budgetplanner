@@ -22,11 +22,3 @@ limits
 string
 -
 
-/Users/thangvay/CLionProjects/budgetplanner/main.cpp
-iostream
--
-sqlite3.h
--
-budgetSQL.h
-/Users/thangvay/CLionProjects/budgetplanner/budgetSQL.h
-
