@@ -12,7 +12,7 @@
 
 ## Overview
 
-This is a simple budget planner application built using C++ and SQLite. The application allows you to create a table, add transactions, view transactions, delete transactions, and drop the table.
+This is a simple budget planner application built using C++ and SQLite. The application allows you to create a table, add transactions, view transactions, delete transactions, and drop the table quickly.
 
 ## Features
 
