@@ -26,7 +26,7 @@ This is a simple budget planner application built using C++ and SQLite. The appl
 
 - C++ Compiler (e.g., g++)
 - SQLite3 library
-
+- [Google Test](https://github.com/google/googletest)
 ## Installation
 
 1. **Clone the Repository**
